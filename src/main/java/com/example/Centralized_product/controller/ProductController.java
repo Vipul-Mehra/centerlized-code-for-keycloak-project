@@ -16,6 +16,7 @@ public class ProductController {
 
     @GetMapping("data")
     public List<Product> getAllProducts() {
+
         return productRepository.findAll();
     }
 
