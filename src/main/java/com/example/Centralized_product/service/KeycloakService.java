@@ -1,29 +1,22 @@
 package com.example.Centralized_product.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
-
-import java.security.KeyFactory;
-import java.security.PublicKey;
-import java.security.spec.X509EncodedKeySpec;
-import java.util.Base64;
-import java.util.Map;
-import java.util.Optional;
-
 import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.Map;
+import java.util.Optional;
 
 @Service
 public class KeycloakService {
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private final ObjectMapper mapper = new ObjectMapper();
 
     /**
-     * Validate token using realm JWKS (no need clientId/clientSecret again)
+     * Validate token using realm JWKS (public keys).
      */
     public Optional<String> validateAndGetUsername(String realm, String token) {
         try {
@@ -39,8 +32,7 @@ public class KeycloakService {
             for (JWK jwk : jwkSet.getKeys()) {
                 if (jwsObject.verify(new RSASSAVerifier(jwk.toRSAKey()))) {
                     Map<String, Object> claims = jwsObject.getPayload().toJSONObject();
-
-                    // Preferred claim for username
+                    // Extract username claim
                     String username = (String) claims.getOrDefault("preferred_username", claims.get("sub"));
                     return Optional.ofNullable(username);
                 }

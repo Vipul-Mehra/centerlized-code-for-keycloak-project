@@ -1,31 +1,35 @@
 package com.example.Centralized_product.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
-import java.util.Set;
+
+import java.util.List;
 import java.util.UUID;
 
 @Data
 @Entity
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 @Table(name = "users")
 public class User {
 
     @Id
     @Column(length = 255)
-    private String id; // store Keycloak UUID here
+    private String id; // store Keycloak UUID or app-generated UUID
 
     private String username;
     private String email;
+    private String firstName;
+    private String lastName;
+    private String password;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
-            inverseJoinColumns = @JoinColumn(name = "role_id", referencedColumnName = "id")
-    )
-    private Set<Role> roles;
+    // One user → many roles
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @JsonIgnoreProperties("user")
+    private List<Role> roles;
 
-    // Generate UUID for local users if id is not set
     @PrePersist
     public void prePersist() {
         if (id == null) {
@@ -33,3 +37,4 @@ public class User {
         }
     }
 }
+

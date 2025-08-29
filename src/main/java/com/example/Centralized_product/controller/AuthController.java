@@ -1,18 +1,15 @@
 package com.example.Centralized_product.controller;
 
-import com.example.Centralized_product.entities.User;
 import com.example.Centralized_product.repository.UserRepository;
+import com.example.Centralized_product.repository.SubscriptionRepository;
 import com.example.Centralized_product.service.KeycloakService;
-import com.example.Centralized_product.security.JwtUtil;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
-
-import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -24,18 +21,25 @@ import java.util.Optional;
 public class AuthController {
 
     private final UserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
-    private final KeycloakService keycloakService; // 👉 ADD THIS
+    private final KeycloakService keycloakService;
+    private final SubscriptionRepository subscriptionRepository;
 
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestParam String username, @RequestParam String password) {
+    /**
+     * Login user via Keycloak (password grant).
+     */
+    @PostMapping("/login/{realm}")
+    public ResponseEntity<String> login(
+            @PathVariable String realm,
+            @RequestParam String clientId,
+            @RequestParam String username,
+            @RequestParam String password) {
+
         RestTemplate restTemplate = new RestTemplate();
-        String url = "http://localhost:8080/realms/master/protocol/openid-connect/token";
+        String url = "http://localhost:8080/realms/" + realm + "/protocol/openid-connect/token";
 
         MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
         map.add("grant_type", "password");
-        map.add("client_id", "mycompany-realm1111-realm");
+        map.add("client_id", clientId);
         map.add("username", username);
         map.add("password", password);
 
@@ -43,16 +47,17 @@ public class AuthController {
             ResponseEntity<String> response = restTemplate.postForEntity(url, map, String.class);
             return ResponseEntity.ok(response.getBody());
         } catch (HttpClientErrorException e) {
-            // Invalid credentials
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid username or password");
         }
     }
 
-
-    // 👉 ADD THIS: Validates a Keycloak token and then checks your DB for permission
-    @GetMapping("/validate/{realm}")
+    /**
+     * Validate token against Keycloak and check centralized DB for provisioning.
+     */
+    @GetMapping("/validate/{realm}/{product}")
     public ResponseEntity<?> validateFromKeycloakAndDb(
             @PathVariable String realm,
+            @PathVariable String product,
             HttpServletRequest request
     ) {
         String authHeader = request.getHeader("Authorization");
@@ -70,12 +75,15 @@ public class AuthController {
 
         String username = maybeUsername.get();
 
-        // ✅ Check DB for that user
-        return userRepository.findByUsername(username)
-                .<ResponseEntity<?>>map(user -> ResponseEntity.ok("Valid for realm=" + realm + ", user=" + username))
-                .orElseGet(() -> ResponseEntity.status(403).body("User not provisioned in centralized DB"));
+        // ✅ Check subscription DB for that user + product
+        boolean hasAccess = subscriptionRepository
+                .existsByClientClientNameAndProductProductName(username, product);
+
+        if (!hasAccess) {
+            return ResponseEntity.status(403).body("User not subscribed to product=" + product);
+        }
+
+        return ResponseEntity.ok("✅ Valid for realm=" + realm + ", user=" + username + ", product=" + product);
     }
-
-
 
 }

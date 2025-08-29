@@ -18,6 +18,8 @@ public class Client {
 
     private String clientName;
 
+    private String realmName;
+
     @OneToMany(mappedBy = "client", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     // Prevent infinite recursion when serializing Client → Subscriptions → Client
     @JsonIgnoreProperties("client")
