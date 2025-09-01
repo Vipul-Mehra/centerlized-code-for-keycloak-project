@@ -4,23 +4,24 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Data
 @Entity
+@Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Table(name = "roles")
-public class Role {
+public class ProductRoles {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String username;
-    private String roleName;  
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    @JsonIgnoreProperties("productRoles")
+    private Role role;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    @JsonIgnoreProperties("roles")
-    private User user;
+    @JoinColumn(name = "product_id")
+    @JsonIgnoreProperties("productRoles")
+    private Product product;
 }

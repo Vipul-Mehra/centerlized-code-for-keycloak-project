@@ -15,4 +15,6 @@ public class Product {
     private Long id;
 
     private String productName;
+
+    private String productUrl;
 }
