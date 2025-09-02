@@ -15,7 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.client.RestTemplate;
 
 @Configuration
-@EnableMethodSecurity // enables @PreAuthorize, @Secured, etc.
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final KeycloakRealmAndClientRoleConverter roleConverter;
@@ -28,7 +28,7 @@ public class SecurityConfig {
 
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**","/onboard","/products/**").permitAll() // signup/login allowed
+                        .requestMatchers("/auth/**", "/onboard", "/products/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
@@ -51,10 +51,8 @@ public class SecurityConfig {
         return new RestTemplate();
     }
 
-    // 👇 Add this to override Spring Boot’s default generated user
     @Bean
     public UserDetailsService userDetailsService() {
-        // return empty in-memory store → no default user created
-        return new InMemoryUserDetailsManager();
+        return new InMemoryUserDetailsManager(); // no default user
     }
 }

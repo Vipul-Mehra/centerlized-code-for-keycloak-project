@@ -1,14 +1,11 @@
 package com.example.Centralized_product.controller;
 
-import com.example.Centralized_product.repository.UserRepository;
-import com.example.Centralized_product.repository.SubscriptionRepository;
 import com.example.Centralized_product.service.KeycloakService;
+import com.example.Centralized_product.service.RedirectService;
+import com.example.Centralized_product.repository.SubscriptionRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -20,12 +17,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final UserRepository userRepository;
     private final KeycloakService keycloakService;
     private final SubscriptionRepository subscriptionRepository;
+    private final RedirectService redirectService;
 
     /**
-     * Login user via Keycloak (password grant).
+     * Login via Keycloak (Password grant).
      */
     @PostMapping("/login/{realm}")
     public ResponseEntity<String> login(
@@ -37,7 +34,7 @@ public class AuthController {
         RestTemplate restTemplate = new RestTemplate();
         String url = "http://localhost:8080/realms/" + realm + "/protocol/openid-connect/token";
 
-        MultiValueMap<String, String> map = new LinkedMultiValueMap<>();
+        var map = new org.springframework.util.LinkedMultiValueMap<String, String>();
         map.add("grant_type", "password");
         map.add("client_id", clientId);
         map.add("username", username);
@@ -52,10 +49,10 @@ public class AuthController {
     }
 
     /**
-     * Validate token against Keycloak and check centralized DB for provisioning.
+     * Validate token + check subscription.
      */
     @GetMapping("/validate/{realm}/{product}")
-    public ResponseEntity<?> validateFromKeycloakAndDb(
+    public ResponseEntity<?> validateAndAuthorize(
             @PathVariable String realm,
             @PathVariable String product,
             HttpServletRequest request
@@ -75,7 +72,7 @@ public class AuthController {
 
         String username = maybeUsername.get();
 
-        // ✅ Check subscription DB for that user + product
+        // Check subscription
         boolean hasAccess = subscriptionRepository
                 .existsByClientClientNameAndProductProductName(username, product);
 
@@ -83,7 +80,11 @@ public class AuthController {
             return ResponseEntity.status(403).body("User not subscribed to product=" + product);
         }
 
-        return ResponseEntity.ok("✅ Valid for realm=" + realm + ", user=" + username + ", product=" + product);
-    }
+        // Return product URL instead of redirecting
+        String productUrl = redirectService.getRedirectUrl(product);
 
+        return ResponseEntity.ok().body(
+                "✅ User authorized. Product URL = " + productUrl
+        );
+    }
 }
