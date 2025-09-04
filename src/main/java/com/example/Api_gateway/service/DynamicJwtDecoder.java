@@ -1,4 +1,4 @@
-package com.example.Centralized_product.service;
+package com.example.Api_gateway.service;
 
 import com.nimbusds.jose.jwk.source.RemoteJWKSet;
 import com.nimbusds.jose.proc.SecurityContext;

@@ -1,4 +1,4 @@
-package com.example.Centralized_product.config;
+package com.example.Api_gateway.config;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;

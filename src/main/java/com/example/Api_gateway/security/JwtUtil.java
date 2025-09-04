@@ -1,4 +1,4 @@
-package com.example.Centralized_product.security;
+package com.example.Api_gateway.security;
 
 import io.jsonwebtoken.*;
 import org.springframework.stereotype.Component;

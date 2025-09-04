@@ -1,4 +1,4 @@
-package com.example.Centralized_product.dto;
+package com.example.Api_gateway.dto;
 import lombok.Data;
 
 @Data

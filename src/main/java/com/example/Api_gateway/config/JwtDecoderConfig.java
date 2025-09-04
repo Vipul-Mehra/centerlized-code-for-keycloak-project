@@ -1,7 +1,7 @@
-package com.example.Centralized_product.config;
+package com.example.Api_gateway.config;
 
 
-import com.example.Centralized_product.service.DynamicJwtDecoder;
+import com.example.Api_gateway.service.DynamicJwtDecoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.jwt.JwtDecoder;

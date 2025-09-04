@@ -1,4 +1,4 @@
-package com.example.Centralized_product.config;
+package com.example.Api_gateway.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

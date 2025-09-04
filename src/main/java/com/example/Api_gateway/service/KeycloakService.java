@@ -1,4 +1,4 @@
-package com.example.Centralized_product.service;
+package com.example.Api_gateway.service;
 
 import com.nimbusds.jose.JWSObject;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
