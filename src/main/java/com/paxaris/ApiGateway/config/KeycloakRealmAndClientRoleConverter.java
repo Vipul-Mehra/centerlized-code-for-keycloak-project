@@ -1,4 +1,4 @@
-package com.example.Api_gateway.config;
+package com.paxaris.ApiGateway.config;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;

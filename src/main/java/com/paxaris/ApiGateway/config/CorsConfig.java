@@ -1,4 +1,4 @@
-package com.example.Api_gateway.config;
+package com.paxaris.ApiGateway.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;

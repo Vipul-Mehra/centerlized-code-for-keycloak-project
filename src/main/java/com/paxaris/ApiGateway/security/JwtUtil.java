@@ -1,4 +1,4 @@
-package com.example.Api_gateway.security;
+package com.paxaris.ApiGateway.security;
 
 import io.jsonwebtoken.*;
 import org.springframework.stereotype.Component;

@@ -1,6 +1,6 @@
-package com.example.Api_gateway.config;
+package com.paxaris.ApiGateway.config;
 
-import com.example.Api_gateway.service.DynamicJwtDecoder;
+import com.paxaris.ApiGateway.service.DynamicJwtDecoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

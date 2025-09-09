@@ -1,4 +1,4 @@
-package com.example.Api_gateway.dto;
+package com.paxaris.ApiGateway.dto;
 import lombok.Data;
 
 @Data

@@ -1,12 +1,9 @@
-package com.example.Api_gateway.service;
+package com.paxaris.ApiGateway.service;
 
-import com.nimbusds.jose.jwk.source.RemoteJWKSet;
-import com.nimbusds.jose.proc.SecurityContext;
 import com.nimbusds.jwt.JWTParser;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Component;
 
-import java.net.URL;
 import java.text.ParseException;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
