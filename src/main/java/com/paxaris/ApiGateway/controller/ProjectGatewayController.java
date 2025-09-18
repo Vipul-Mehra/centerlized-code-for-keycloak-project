@@ -32,7 +32,7 @@ public class ProjectGatewayController {
         String clientId = keycloakService.getClientId(realm, client, token);
         if (clientId == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Client not found");
 
-        boolean created = keycloakService.createRole(realm, clientId, role, token);
+        boolean created = keycloakService.createRole(realm, clientId, role, token, client);
         if (!created) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to create role");
 
         // Sync to Project Manager DB
@@ -61,7 +61,7 @@ public class ProjectGatewayController {
         String clientId = keycloakService.getClientId(realm, client, token);
         if (clientId == null) return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Client not found");
 
-        boolean updated = keycloakService.updateRole(realm, clientId, roleName, role, token);
+        boolean updated = keycloakService.updateRole(realm, clientId, roleName, role, token, client);
         if (!updated) return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Failed to update role");
 
         // Sync updated role

@@ -12,11 +12,11 @@
 		<relativePath/>
 	</parent>
 
-	<groupId>com.example</groupId>
-	<artifactId>centralized-product</artifactId>
+	<groupId>com.paxaris</groupId>
+	<artifactId>Api_gateway</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>Api gateway</name>
-	<description>Centralized Authentication &amp; Product Management Service</description>
+	<name>Api_gateway</name>
+	<description>Api_gateway</description>
 
 
 	<properties>
