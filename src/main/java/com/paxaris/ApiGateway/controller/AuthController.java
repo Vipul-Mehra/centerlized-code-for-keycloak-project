@@ -146,10 +146,5 @@ public class AuthController {
         private List<String> roleName;
     }
 
-    @Data
-    public static class ProductDTO {
-        private String productName;
-        private String productUrl;
-        private String description;
-    }
+
 }

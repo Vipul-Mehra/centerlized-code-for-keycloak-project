@@ -1,15 +1,13 @@
 package com.paxaris.ApiGateway.dto;
 
-
 import lombok.Data;
+import java.util.List;
 
 @Data
-public class RealmProductRoleUrl {
+public class RoleRequest {
+    private Long id;
     private String realmName;
     private String productName;
     private String roleName;
-    private String url;
-    private String uri;
-
-
+    private List<UrlEntry> urls;
 }

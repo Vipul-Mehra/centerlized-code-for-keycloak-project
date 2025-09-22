@@ -1,10 +1,10 @@
-package com.example.Centralized_product;
+package com.paxaris.ApiGateway;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class CentralizedProductApplicationTests {
+class ApiGateway {
 
 	@Test
 	void contextLoads() {
