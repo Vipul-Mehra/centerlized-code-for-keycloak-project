@@ -1,13 +1,13 @@
-	package com.paxaris.ApiGateway;
+	package com.paxaris.identity_service;
 
 	import org.springframework.boot.SpringApplication;
 	import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 	@SpringBootApplication
-	public class ApiGateway {
+	public class identityService {
 
 		public static void main(String[] args) {
-			SpringApplication.run(ApiGateway.class, args);
+			SpringApplication.run(identityService.class, args);
 		}
 
 	}

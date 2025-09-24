@@ -1,6 +1,6 @@
-package com.paxaris.ApiGateway.config;
+package com.paxaris.identity_service.config;
 
-import com.paxaris.ApiGateway.service.DynamicJwtDecoder;
+import com.paxaris.identity_service.service.DynamicJwtDecoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -28,13 +28,7 @@ public class SecurityConfig {
 
         http.csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**",
-                                "/v3/api-docs/**",
-                                "/swagger-ui.html",
-                                "/swagger-ui/**",
-                                "/webjars/**").permitAll()
-                        .anyRequest().authenticated()
-
+                        .anyRequest().permitAll() // Allow all requests to any path
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(jwt -> {

@@ -1,4 +1,4 @@
-package com.paxaris.ApiGateway.config;
+package com.paxaris.identity_service.config;
 
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.core.GrantedAuthority;

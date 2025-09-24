@@ -1,4 +1,4 @@
-package com.paxaris.ApiGateway.exception;
+package com.paxaris.identity_service.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

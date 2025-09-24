@@ -1,4 +1,4 @@
-package com.paxaris.ApiGateway.config;
+package com.paxaris.identity_service.config;
 
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Info;

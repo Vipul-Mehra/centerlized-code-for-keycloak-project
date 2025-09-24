@@ -1,6 +1,6 @@
-package com.paxaris.ApiGateway.controller;
+package com.paxaris.identity_service.controller;
 
-import com.paxaris.ApiGateway.service.KeycloakService;
+import com.paxaris.identity_service.service.KeycloakService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -48,24 +48,25 @@ public class AuthController {
 
     // ===================== TOKEN VALIDATION =====================
     @GetMapping("/validate/{realm}")
-    public ResponseEntity<?> validateToken(
+    public ResponseEntity<Map<String, String>> validateToken(
             @PathVariable String realm,
             HttpServletRequest request
     ) {
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return ResponseEntity.status(401).body("Missing or invalid Authorization header");
+            return ResponseEntity.status(401)
+                    .body(Map.of("error", "Missing or invalid Authorization header"));
         }
 
-        String incomingToken = authHeader.substring("Bearer ".length());
-        Optional<String> maybeUsername = keycloakService.validateAndGetUsername(realm, incomingToken);
+        String token = authHeader.substring("Bearer ".length());
+        Optional<String> username = keycloakService.validateAndGetUsername(realm, token);
 
-        if (maybeUsername.isEmpty()) {
-            return ResponseEntity.status(401).body("Invalid Keycloak token");
-        }
-
-        return ResponseEntity.ok("✅ Token valid for user=" + maybeUsername.get());
+        return username
+                .map(s -> ResponseEntity.ok(Map.of("username", s)))
+                .orElseGet(() -> ResponseEntity.status(401)
+                        .body(Map.of("error", "Invalid Keycloak token")));
     }
+
 
     // ===================== VALIDATE & AUTHORIZE =====================
     @GetMapping("/validate/{realm}/{product}")
@@ -74,34 +75,27 @@ public class AuthController {
             @PathVariable String product,
             HttpServletRequest request
     ) {
-
-        // Extract token
         String authHeader = request.getHeader("Authorization");
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return ResponseEntity.status(401).body("Missing or invalid Authorization header");
         }
-        String incomingToken = authHeader.substring("Bearer ".length());
-        Optional<String> maybeUsername = keycloakService.validateAndGetUsername(realm, incomingToken);
 
-        if (maybeUsername.isEmpty()) {
-            return ResponseEntity.status(401).body("Invalid Keycloak token");
-        }
+        String token = authHeader.substring("Bearer ".length());
+        Optional<String> usernameOpt = keycloakService.validateAndGetUsername(realm, token);
 
-        String username = maybeUsername.get();
+        if (usernameOpt.isEmpty()) return ResponseEntity.status(401).body("Invalid Keycloak token");
 
-        // Extract all roles from token
-        List<String> roleName = keycloakService.getRoleFromToken(incomingToken);
-        if (roleName.isEmpty()) {
-            return ResponseEntity.status(403).body("No roles assigned to user");
-        }
+        String username = usernameOpt.get();
+        List<String> roles = keycloakService.getRoleFromToken(token);
+        if (roles.isEmpty()) return ResponseEntity.status(403).body("No roles assigned to user");
 
-        // Call Gateway service once with all roles
+        // Call Gateway service to check access
         String gatewayUrl = "http://localhost:8085/access/check";
         Map<String, Object> payload = new HashMap<>();
         payload.put("username", username);
         payload.put("product", product);
         payload.put("realm", realm);
-        payload.put("roles", roleName); // <-- send all roles in a single request
+        payload.put("roles", roles);
 
         ProductAccessResponse access;
         try {
@@ -111,32 +105,21 @@ public class AuthController {
             return ResponseEntity.status(500).body("Failed to connect to Gateway service");
         }
 
-        if (access == null || !access.isAllowed()) {
-            return ResponseEntity.status(403).body("Access denied for product " + product);
-        }
+        if (access == null || !access.isAllowed()) return ResponseEntity.status(403).body("Access denied");
 
-        if (access.getProductUrl() == null || access.getProductUrl().isBlank()) {
-            return ResponseEntity.status(500).body("Product base URL not found for " + product);
-        }
-
-        // Build redirect URL
         String baseUrl = access.getProductUrl().endsWith("/") ?
                 access.getProductUrl().substring(0, access.getProductUrl().length() - 1) :
                 access.getProductUrl();
-
-        String uriPart = (access.getProductUri() != null && !access.getProductUri().isBlank())
-                ? (access.getProductUri().startsWith("/") ? access.getProductUri() : "/" + access.getProductUri())
-                : "";
-
+        String uriPart = (access.getProductUri() != null && !access.getProductUri().isBlank()) ?
+                (access.getProductUri().startsWith("/") ? access.getProductUri() : "/" + access.getProductUri()) :
+                "";
         String redirectUrl = baseUrl + uriPart;
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create(redirectUrl));
-
-        return new ResponseEntity<>(headers, HttpStatus.FOUND); // 302 redirect
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
 
-    // ===================== DTOs =====================
     @Data
     public static class ProductAccessResponse {
         private boolean allowed;
@@ -145,6 +128,4 @@ public class AuthController {
         private String productUri;
         private List<String> roleName;
     }
-
-
 }

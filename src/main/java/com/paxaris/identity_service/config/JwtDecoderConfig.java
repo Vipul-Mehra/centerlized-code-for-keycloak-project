@@ -1,7 +1,7 @@
-package com.paxaris.ApiGateway.config;
+package com.paxaris.identity_service.config;
 
 
-import com.paxaris.ApiGateway.service.DynamicJwtDecoder;
+import com.paxaris.identity_service.service.DynamicJwtDecoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.oauth2.jwt.JwtDecoder;

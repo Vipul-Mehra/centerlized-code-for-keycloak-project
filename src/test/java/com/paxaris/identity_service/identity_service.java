@@ -1,10 +1,10 @@
-package com.paxaris.ApiGateway;
+package com.paxaris.identity_service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ApiGateway {
+class identity_service {
 
 	@Test
 	void contextLoads() {

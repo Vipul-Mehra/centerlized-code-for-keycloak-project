@@ -1,4 +1,4 @@
-package com.paxaris.ApiGateway.dto;
+package com.paxaris.identity_service.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

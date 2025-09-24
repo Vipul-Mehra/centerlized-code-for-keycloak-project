@@ -1,4 +1,4 @@
-package com.paxaris.ApiGateway.service;
+package com.paxaris.identity_service.service;
 
 import com.nimbusds.jwt.JWTParser;
 import org.springframework.security.oauth2.jwt.*;
